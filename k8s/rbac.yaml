@@ -1,0 +1,90 @@
+---
+# Service Account for Quiz System
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: quiz-system
+  namespace: quiz-system
+  labels:
+    app: quiz-system
+
+---
+# ClusterRole for Quiz System
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: quiz-system
+  labels:
+    app: quiz-system
+rules:
+# Allow reading pods
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+# Allow reading services
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+
+# Allow reading configmaps
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+
+# Allow reading endpoints
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "list", "watch"]
+
+---
+# ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: quiz-system
+  labels:
+    app: quiz-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: quiz-system
+subjects:
+- kind: ServiceAccount
+  name: quiz-system
+  namespace: quiz-system
+
+---
+# Role for pod operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: quiz-system
+  namespace: quiz-system
+  labels:
+    app: quiz-system
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/logs"]
+  verbs: ["get"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: quiz-system
+  namespace: quiz-system
+  labels:
+    app: quiz-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: quiz-system
+subjects:
+- kind: ServiceAccount
+  name: quiz-system
+  namespace: quiz-system

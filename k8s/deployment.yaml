@@ -1,0 +1,255 @@
+---
+# Deployment for Quiz System Backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-system-prod
+  namespace: quiz-system
+  labels:
+    app: quiz-system
+    version: v1
+  annotations:
+    description: "Production deployment for Online Quiz System"
+spec:
+  # Number of replicas
+  replicas: 3
+  
+  # Strategy for rolling updates
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime deployment
+  
+  # Pod selector
+  selector:
+    matchLabels:
+      app: quiz-system
+      tier: backend
+  
+  # Pod template
+  template:
+    metadata:
+      labels:
+        app: quiz-system
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    
+    spec:
+      # Service Account
+      serviceAccountName: quiz-system
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      # Affinity rules
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - quiz-system
+              topologyKey: kubernetes.io/hostname
+      
+      # Init containers
+      initContainers:
+      - name: db-migration
+        image: ghcr.io/quiz-system/quiz-system:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "echo 'Database migration would run here'"]
+        env:
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: quiz-system-secrets
+              key: SPRING_DATASOURCE_URL
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: quiz-system-secrets
+              key: SPRING_DATASOURCE_USERNAME
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quiz-system-secrets
+              key: SPRING_DATASOURCE_PASSWORD
+      
+      # Containers
+      containers:
+      - name: quiz-system
+        image: ghcr.io/quiz-system/quiz-system:latest
+        imagePullPolicy: IfNotPresent
+        
+        # Ports
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        
+        # Environment variables from ConfigMap and Secrets
+        envFrom:
+        - configMapRef:
+            name: quiz-system-config
+        - secretRef:
+            name: quiz-system-secrets
+        
+        # Additional environment variables
+        env:
+        - name: JAVA_OPTS
+          value: "-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xms512m -Xmx1024m"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        
+        # Startup probe (checks if app is starting)
+        startupProbe:
+          httpGet:
+            path: /api/health/startup
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        
+        # Readiness probe (checks if app is ready to receive traffic)
+        readinessProbe:
+          httpGet:
+            path: /api/health/ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Liveness probe (checks if app is alive)
+        livenessProbe:
+          httpGet:
+            path: /api/health/live
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Resource requests and limits
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        
+        # Volume mounts
+        volumeMounts:
+        - name: app-logs
+          mountPath: /var/log/app
+        - name: tmp
+          mountPath: /tmp
+        
+        # Security context for container
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      
+      # Volumes
+      volumes:
+      - name: app-logs
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+      
+      # Image pull secrets
+      imagePullSecrets:
+      - name: ghcr-secret
+      
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+---
+# Staging Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-system-staging
+  namespace: staging
+  labels:
+    app: quiz-system
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: quiz-system
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: quiz-system
+        tier: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: quiz-system
+        image: ghcr.io/quiz-system/quiz-system:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: quiz-system-config
+        - secretRef:
+            name: quiz-system-secrets
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      imagePullSecrets:
+      - name: ghcr-secret
