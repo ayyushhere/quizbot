@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizBot Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="app-shell hero-grid">
+        <section class="space-y-7">
+            <div class="brand">
+                <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+                <span class="text-2xl">QuizBot</span>
+            </div>
+
+            <div class="space-y-5">
+                <span class="pill bg-white">AI powered quiz desk</span>
+                <h1 class="max-w-3xl text-5xl font-black leading-tight sm:text-6xl">Practice, answer, and level up with a playful quiz buddy.</h1>
+                <p class="max-w-2xl text-lg font-bold text-slate-600">A bright responsive interface for students, quiz takers, and admins.</p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="stat card">
+                    <i data-lucide="brain-circuit"></i>
+                    <strong class="text-2xl">12</strong>
+                    <span class="font-bold text-slate-500">Active quizzes</span>
+                </div>
+                <div class="stat card">
+                    <i data-lucide="target"></i>
+                    <strong class="text-2xl">86%</strong>
+                    <span class="font-bold text-slate-500">Avg score</span>
+                </div>
+                <div class="stat card">
+                    <i data-lucide="users"></i>
+                    <strong class="text-2xl">240</strong>
+                    <span class="font-bold text-slate-500">Learners</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel p-5 sm:p-7">
+            <img class="mascot" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
+            <form class="mt-5 grid gap-4" onsubmit="saveDemoUser(event)">
+                <label class="grid gap-2">
+                    <span class="font-black">Name</span>
+                    <input class="field" data-name type="text" value="Asha" autocomplete="name">
+                </label>
+                <label class="grid gap-2">
+                    <span class="font-black">Email</span>
+                    <input class="field" type="email" value="asha@example.com" autocomplete="email">
+                </label>
+                <label class="grid gap-2">
+                    <span class="font-black">Password</span>
+                    <input class="field" type="password" value="secret123" autocomplete="current-password">
+                </label>
+                <button class="btn btn-primary w-full" type="submit">
+                    <i data-lucide="log-in"></i>
+                    Enter dashboard
+                </button>
+                <a class="btn w-full" href="admin-login.html">
+                    <i data-lucide="shield-check"></i>
+                    Admin login
+                </a>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
