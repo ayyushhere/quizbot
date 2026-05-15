@@ -451,11 +451,15 @@ label span {
 
 .w-full { width: 100%; }
 .w-24 { width: 6rem; }
+.w-40 { width: 10rem; }
 .w-44 { width: 11rem; }
+.min-h-24 { min-height: 6rem; }
 .max-w-2xl { max-width: 42rem; }
 .max-w-3xl { max-width: 48rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
+.justify-self-start { justify-self: start; }
 
+.mt-1 { margin-top: 0.25rem; }
 .mt-4 { margin-top: 1rem; }
 .mt-5 { margin-top: 1.25rem; }
 .mt-6 { margin-top: 1.5rem; }
@@ -482,6 +486,9 @@ label span {
 
 .bg-white { background-color: #ffffff; }
 .bg-\[\#ffd166\] { background-color: #ffd166; }
+.bg-\[\#e8fbf8\] { background-color: #e8fbf8; }
+.bg-\[\#fff4d3\] { background-color: #fff4d3; }
+.bg-\[\#eaf0ff\] { background-color: #eaf0ff; }
 
 /* Responsive */
 @media (min-width: 640px) {
