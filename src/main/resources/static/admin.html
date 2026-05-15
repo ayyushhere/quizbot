@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizBot Admin</title>
+    <script>
+        if (localStorage.getItem("adminLoggedIn") !== "true") {
+            window.location.replace("admin-login.html");
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-require-admin>
+    <header class="app-shell topbar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+            <span class="text-2xl">QuizBot</span>
+        </a>
+        <nav class="nav-links">
+            <a class="nav-link" href="dashboard.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+            <a class="nav-link" href="quiz.html"><i data-lucide="list-checks"></i><span>Quiz</span></a>
+            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Result</span></a>
+            <a class="nav-link active" href="admin.html"><i data-lucide="shield-check"></i><span>Admin</span></a>
+            <button class="nav-link" type="button" onclick="adminLogout(event)"><i data-lucide="log-out"></i><span>Admin Logout</span></button>
+        </nav>
+    </header>
+
+    <main class="app-shell page-grid">
+        <aside class="panel p-5">
+            <img class="mx-auto w-40" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
+            <h1 class="mt-5 text-3xl font-black">Admin Panel</h1>
+            <p class="mt-1 font-bold text-slate-500">Signed in as <span data-admin-name>Quiz Admin</span></p>
+            <div class="mt-5 grid gap-3">
+                <button class="btn btn-primary w-full" type="button" data-admin-tab="quizzes"><i data-lucide="book-plus"></i>Quizzes</button>
+                <button class="btn w-full" type="button" data-admin-tab="users"><i data-lucide="users"></i>Users</button>
+                <button class="btn w-full" type="button" data-admin-tab="results"><i data-lucide="chart-no-axes-combined"></i>Results</button>
+                <button class="btn btn-coral w-full" type="button" onclick="adminLogout(event)"><i data-lucide="log-out"></i>Admin Logout</button>
+            </div>
+        </aside>
+
+        <section class="space-y-6">
+            <section class="panel p-5 sm:p-6" data-admin-panel="quizzes">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm font-black text-slate-500">Quiz manager</p>
+                        <h2 class="text-3xl font-black">Create Quiz</h2>
+                    </div>
+                    <button class="btn btn-yellow" type="button"><i data-lucide="plus"></i>New question</button>
+                </div>
+                <form class="mt-6 grid gap-4">
+                    <input class="field" value="Spring Boot Basics" aria-label="Quiz title">
+                    <textarea class="field min-h-24" aria-label="Quiz description">MVC, JPA, repositories, and result calculation.</textarea>
+                    <div class="grid gap-3 md:grid-cols-2">
+                        <input class="field" value="Which annotation starts Spring Boot?" aria-label="Question">
+                        <input class="field" value="@SpringBootApplication" aria-label="Correct answer">
+                    </div>
+                    <button class="btn btn-primary justify-self-start" type="button"><i data-lucide="save"></i>Save quiz</button>
+                </form>
+            </section>
+
+            <section class="panel p-5 sm:p-6" data-admin-panel="users" hidden>
+                <h2 class="text-3xl font-black">Users</h2>
+                <div class="table-wrap mt-4">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Name</th><th>Email</th><th>Completed</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Asha</td><td>asha@example.com</td><td>8</td><td><span class="pill bg-[#e8fbf8]">Active</span></td></tr>
+                            <tr><td>Rahul</td><td>rahul@example.com</td><td>5</td><td><span class="pill bg-[#fff4d3]">Learning</span></td></tr>
+                            <tr><td>Mira</td><td>mira@example.com</td><td>11</td><td><span class="pill bg-[#eaf0ff]">Top score</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel p-5 sm:p-6" data-admin-panel="results" hidden>
+                <h2 class="text-3xl font-black">Results</h2>
+                <div class="table-wrap mt-4">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Quiz</th><th>User</th><th>Score</th><th>Submitted</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Spring Boot Basics</td><td>Asha</td><td>3/3</td><td>Today</td></tr>
+                            <tr><td>Java Core</td><td>Rahul</td><td>7/10</td><td>Yesterday</td></tr>
+                            <tr><td>REST APIs</td><td>Mira</td><td>9/10</td><td>This week</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
