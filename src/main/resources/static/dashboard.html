@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizBot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-shell topbar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+            <span class="text-2xl">QuizBot</span>
+        </a>
+        <nav class="nav-links">
+            <a class="nav-link active" href="dashboard.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+            <a class="nav-link" href="quiz.html"><i data-lucide="list-checks"></i><span>Quiz</span></a>
+            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Result</span></a>
+            <a class="nav-link" href="admin-login.html"><i data-lucide="shield-check"></i><span>Admin Login</span></a>
+            <button class="nav-link" type="button" onclick="logout(event)"><i data-lucide="log-out"></i><span>Logout</span></button>
+        </nav>
+    </header>
+
+    <main class="app-shell page-grid">
+        <aside class="panel p-5">
+            <img class="mx-auto w-44" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
+            <div class="mt-5">
+                <p class="text-sm font-black text-slate-500">Welcome back</p>
+                <h1 class="text-3xl font-black" data-user-name>Quiz Pilot</h1>
+            </div>
+            <div class="mt-6 grid gap-3">
+                <a class="btn btn-primary w-full" href="quiz.html"><i data-lucide="play"></i>Start quiz</a>
+                <a class="btn w-full" href="result.html"><i data-lucide="bar-chart-3"></i>View results</a>
+                <button class="btn btn-coral w-full" type="button" onclick="logout(event)"><i data-lucide="log-out"></i>Logout</button>
+            </div>
+        </aside>
+
+        <section class="space-y-6">
+            <div class="grid gap-4 md:grid-cols-3">
+                <div class="stat card">
+                    <i data-lucide="book-open-check"></i>
+                    <strong class="text-3xl">8</strong>
+                    <span class="font-bold text-slate-500">Completed</span>
+                </div>
+                <div class="stat card">
+                    <i data-lucide="timer"></i>
+                    <strong class="text-3xl">14m</strong>
+                    <span class="font-bold text-slate-500">Best time</span>
+                </div>
+                <div class="stat card">
+                    <i data-lucide="medal"></i>
+                    <strong class="text-3xl">Gold</strong>
+                    <span class="font-bold text-slate-500">Current rank</span>
+                </div>
+            </div>
+
+            <section class="panel p-5 sm:p-6">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm font-black text-slate-500">Available quizzes</p>
+                        <h2 class="text-3xl font-black">Pick a topic</h2>
+                    </div>
+                    <span class="pill bg-[#ffd166]">4 quiz packs</span>
+                </div>
+                <div class="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-4" data-quiz-list></div>
+            </section>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
