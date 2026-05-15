@@ -47,7 +47,7 @@ Special thanks to the open-source community for providing excellent tools like S
 
 ## ABSTRACT
 
-The "Online Quiz System using Spring Boot, Docker, Maven, GitHub Actions and Kubernetes" is a cloud-native web application designed to facilitate online quizzes for educational institutions and organizations. Developed using Java Spring Boot for the backend, React.js for the frontend, and MySQL for data persistence, the system incorporates DevOps practices with Docker for containerization, GitHub Actions for CI/CD automation, and Kubernetes for orchestration and deployment.
+The "Online Quiz System using Spring Boot, Docker, Maven, GitHub Actions and Kubernetes" is a cloud-native web application designed to facilitate online quizzes for educational institutions and organizations. Developed using Java Spring Boot for the backend, HTML/CSS/JavaScript for the frontend, and MySQL for data persistence, the system incorporates DevOps practices with Docker for containerization, GitHub Actions for CI/CD automation, and Kubernetes for orchestration and deployment.
 
 The project addresses the limitations of traditional quiz systems by providing a scalable, secure, and automated platform. Key features include user authentication, quiz creation and management, real-time scoring, and result analysis. DevOps integration ensures continuous integration and deployment, reducing manual errors and improving scalability.
 
@@ -77,7 +77,7 @@ This report details the complete implementation, from initial setup to deploymen
    2.4 GitHub Actions  
    2.5 Kubernetes  
    2.6 MySQL/MongoDB  
-   2.7 React.js  
+   2.7 HTML/CSS/JavaScript  
    2.8 REST APIs  
    2.9 Spring Security  
    2.10 GitHub  
@@ -229,7 +229,7 @@ The proposed system adopts a microservices-oriented architecture using Spring Bo
 
 ### 1.6 Scope of the Project
 
-The project covers user authentication, quiz management, real-time scoring, and result analysis. It includes Docker containerization, CI/CD automation, and Kubernetes deployment. Optional features like React.js frontend and AWS deployment are included for completeness.
+The project covers user authentication, quiz management, real-time scoring, and result analysis. It includes Docker containerization, CI/CD automation, and Kubernetes deployment. Optional features like HTML/CSS/JavaScript frontend and AWS deployment are included for completeness.
 
 ### 1.7 Stakeholders
 
@@ -325,17 +325,17 @@ DevOps bridges development and operations, enabling faster and more reliable sof
 
 **Real-world Usage:** Web applications.
 
-### 2.7 React.js
+### 2.7 HTML/CSS/JavaScript
 
-**Definition:** React.js is a JavaScript library for building user interfaces.
+**Definition:** HTML for structure, CSS for styling, JavaScript for interactivity.
 
-**Features:** Component-based, virtual DOM.
+**Features:** Client-side rendering, DOM manipulation.
 
-**Advantages:** Interactive UIs.
+**Advantages:** Lightweight, no framework dependencies.
 
-**Why Selected:** For dynamic frontend.
+**Why Selected:** For simple, responsive frontend.
 
-**Real-world Usage:** Single-page applications.
+**Real-world Usage:** Static web applications.
 
 ### 2.8 REST APIs
 
@@ -380,6 +380,7 @@ DevOps bridges development and operations, enabling faster and more reliable sof
 | Spring Boot | Rapid development | Learning curve | Backend APIs |
 | Docker | Portability | Resource overhead | Containerization |
 | Kubernetes | Scalability | Complexity | Orchestration |
+| HTML/CSS/JS | Lightweight | Manual DOM management | Simple frontends |
 
 ---
 
@@ -388,7 +389,7 @@ DevOps bridges development and operations, enabling faster and more reliable sof
 ### 3.1 High-Level Architecture Diagram
 
 ```
-[Frontend (React.js)] <--> [Spring Boot Backend] <--> [MySQL Database]
+[Frontend (HTML/CSS/JS)] <--> [Spring Boot Backend] <--> [MySQL Database]
                       |
                       v
                 [Docker Containers] --> [Kubernetes Cluster] --> [AWS Cloud]
@@ -396,7 +397,7 @@ DevOps bridges development and operations, enabling faster and more reliable sof
 
 ### 3.2 Frontend-Backend Workflow
 
-User interacts with React.js frontend, which calls Spring Boot REST APIs.
+User interacts with HTML/CSS/JavaScript frontend, which calls Spring Boot REST APIs.
 
 ### 3.3 Spring Boot REST API Architecture
 
@@ -718,7 +719,7 @@ Advanced reporting.
 - Maven Docs: https://maven.apache.org
 - GitHub Actions: https://docs.github.com/en/actions
 - MySQL: https://dev.mysql.com/doc
-- React.js: https://reactjs.org/docs
+- HTML/CSS/JavaScript: https://developer.mozilla.org/en-US/docs/Web
 - GitHub: https://github.com
 
 ---
@@ -865,7 +866,7 @@ Key goals:
 - Spring Security Crypto (BCrypt password hashing)
 - MySQL database
 - Maven for dependency management and build
-- Thymeleaf and static HTML/CSS/JavaScript for the frontend
+- HTML/CSS/JavaScript for the frontend
 - Lombok for boilerplate reduction (optional)
 
 ## 4. System Architecture
