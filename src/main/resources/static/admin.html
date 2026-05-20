@@ -3,100 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizBot Admin</title>
-    <script>
-        if (localStorage.getItem("adminLoggedIn") !== "true") {
-            window.location.replace("admin-login.html");
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QuizBot - Admin Dashboard</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body data-require-admin>
     <header class="app-shell topbar">
         <a class="brand" href="dashboard.html">
             <span class="brand-mark"><i data-lucide="sparkles"></i></span>
-            <span class="text-2xl">QuizBot</span>
+            <span class="text-2xl font-black">QuizBot</span>
         </a>
         <nav class="nav-links">
             <a class="nav-link" href="dashboard.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-            <a class="nav-link" href="quiz.html"><i data-lucide="list-checks"></i><span>Quiz</span></a>
-            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Result</span></a>
-            <a class="nav-link active" href="admin.html"><i data-lucide="shield-check"></i><span>Admin</span></a>
-            <button class="nav-link" type="button" onclick="adminLogout(event)"><i data-lucide="log-out"></i><span>Admin Logout</span></button>
+            <a class="nav-link" href="quiz.html" id="nav-quiz-link"><i data-lucide="list-checks"></i><span>Quiz</span></a>
+            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Results</span></a>
+            <a class="nav-link active" href="admin.html"><i data-lucide="shield-check"></i><span>Admin Control</span></a>
+            <button class="nav-link" type="button" onclick="adminLogout(event)"><i data-lucide="log-out"></i><span>Logout</span></button>
         </nav>
     </header>
 
-    <main class="app-shell page-grid">
-        <aside class="panel p-5">
-            <img class="mx-auto w-40" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
-            <h1 class="mt-5 text-3xl font-black">Admin Panel</h1>
-            <p class="mt-1 font-bold text-slate-500">Signed in as <span data-admin-name>Quiz Admin</span></p>
-            <div class="mt-5 grid gap-3">
-                <button class="btn btn-primary w-full" type="button" data-admin-tab="quizzes"><i data-lucide="book-plus"></i>Quizzes</button>
-                <button class="btn w-full" type="button" data-admin-tab="users"><i data-lucide="users"></i>Users</button>
-                <button class="btn w-full" type="button" data-admin-tab="results"><i data-lucide="chart-no-axes-combined"></i>Results</button>
-                <button class="btn btn-coral w-full" type="button" onclick="adminLogout(event)"><i data-lucide="log-out"></i>Admin Logout</button>
+    <main class="app-shell page-grid animate-fade-in">
+        <!-- Sidebar Controls -->
+        <aside class="panel flex flex-col gap-5">
+            <div class="text-center">
+                <img class="mascot" src="assets/quiz-ai-mascot.png" alt="QuizBot Mascot">
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Security clearance</p>
+                <h1 class="text-2xl font-black mt-1" data-admin-name>Quiz Admin</h1>
+                <span class="pill pill-success mt-2"><i data-lucide="lock" style="width: 12px; height: 12px;"></i> Root Privileges</span>
+            </div>
+            <div class="space-y-2 mt-2">
+                <button class="btn btn-primary w-full" type="button" data-admin-tab="quizzes" onclick="switchAdminTab('quizzes')">
+                    <i data-lucide="book-open"></i> Quiz Manager
+                </button>
+                <button class="btn w-full" type="button" data-admin-tab="users" onclick="switchAdminTab('users')">
+                    <i data-lucide="users"></i> User Directory
+                </button>
+                <button class="btn w-full" type="button" data-admin-tab="results" onclick="switchAdminTab('results')">
+                    <i data-lucide="history"></i> Attempt Logs
+                </button>
+                <button class="btn btn-coral w-full" type="button" onclick="adminLogout(event)">
+                    <i data-lucide="log-out"></i> Exit Admin
+                </button>
             </div>
         </aside>
 
+        <!-- Main Workspace -->
         <section class="space-y-6">
-            <section class="panel p-5 sm:p-6" data-admin-panel="quizzes">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm font-black text-slate-500">Quiz manager</p>
-                        <h2 class="text-3xl font-black">Create Quiz</h2>
-                    </div>
-                    <button class="btn btn-yellow" type="button"><i data-lucide="plus"></i>New question</button>
+            <!-- Alert Banner -->
+            <div id="admin-alert" class="panel bg-[#eaf0ff] border-indigo-950 p-4 flex items-center justify-between text-white" style="display: none;">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="info" style="color: var(--primary);"></i>
+                    <span class="text-sm font-semibold" id="admin-alert-text">Action completed successfully.</span>
                 </div>
-                <form class="mt-6 grid gap-4">
-                    <input class="field" value="Spring Boot Basics" aria-label="Quiz title">
-                    <textarea class="field min-h-24" aria-label="Quiz description">MVC, JPA, repositories, and result calculation.</textarea>
-                    <div class="grid gap-3 md:grid-cols-2">
-                        <input class="field" value="Which annotation starts Spring Boot?" aria-label="Question">
-                        <input class="field" value="@SpringBootApplication" aria-label="Correct answer">
+                <button class="btn btn-sm" onclick="this.parentElement.style.display='none'"><i data-lucide="x"></i></button>
+            </div>
+
+            <!-- TAB 1: QUIZZES MANAGER -->
+            <section class="space-y-6" id="panel-quizzes">
+                <!-- Create Quiz Panel -->
+                <div class="panel">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">CREATOR STUDIO</p>
+                            <h2 class="text-3xl font-black mt-1">Deploy New Quiz</h2>
+                        </div>
+                        <button class="btn btn-yellow btn-sm" type="button" onclick="addQuestionField()">
+                            <i data-lucide="plus-circle"></i> Add Question
+                        </button>
                     </div>
-                    <button class="btn btn-primary justify-self-start" type="button"><i data-lucide="save"></i>Save quiz</button>
-                </form>
+
+                    <form class="space-y-4" onsubmit="handleCreateQuiz(event)">
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="grid">
+                                <span>Quiz Title</span>
+                                <input class="field" type="text" id="quiz-title" required placeholder="e.g., Docker Fundamentals">
+                            </label>
+                            <label class="grid">
+                                <span>Short Description</span>
+                                <input class="field" type="text" id="quiz-desc" required placeholder="e.g., Test containerization knowledge.">
+                            </label>
+                        </div>
+
+                        <!-- Questions Container -->
+                        <div class="space-y-4 mt-6">
+                            <h3 class="text-lg font-bold text-slate-400 border-b border-slate-900 pb-2">Questions</h3>
+                            <div class="space-y-4" id="form-questions-list">
+                                <!-- Dynamic question fields added here -->
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary mt-4" type="submit">
+                            <i data-lucide="rocket"></i> Deploy Quiz to Database
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Existing Quizzes Panel -->
+                <div class="panel">
+                    <h2 class="text-2xl font-black mb-4">Existing Quizzes</h2>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-quizzes-table">
+                                <tr>
+                                    <td colspan="4" class="text-center text-slate-400 py-4">Loading quiz repository...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
-            <section class="panel p-5 sm:p-6" data-admin-panel="users" hidden>
-                <h2 class="text-3xl font-black">Users</h2>
+            <!-- TAB 2: USER DIRECTORY -->
+            <section class="panel space-y-4 hidden" id="panel-users">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registered Accounts</p>
+                    <h2 class="text-3xl font-black mt-1">User Directory</h2>
+                </div>
                 <div class="table-wrap mt-4">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Name</th><th>Email</th><th>Completed</th><th>Status</th></tr>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Full Name</th>
+                                <th>Email Address</th>
+                            </tr>
                         </thead>
-                        <tbody>
-                            <tr><td>Asha</td><td>asha@example.com</td><td>8</td><td><span class="pill bg-[#e8fbf8]">Active</span></td></tr>
-                            <tr><td>Rahul</td><td>rahul@example.com</td><td>5</td><td><span class="pill bg-[#fff4d3]">Learning</span></td></tr>
-                            <tr><td>Mira</td><td>mira@example.com</td><td>11</td><td><span class="pill bg-[#eaf0ff]">Top score</span></td></tr>
+                        <tbody id="admin-users-table">
+                            <tr>
+                                <td colspan="3" class="text-center text-slate-400 py-4">No users registered yet.</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <section class="panel p-5 sm:p-6" data-admin-panel="results" hidden>
-                <h2 class="text-3xl font-black">Results</h2>
+            <!-- TAB 3: ATTEMPT LOGS -->
+            <section class="panel space-y-4 hidden" id="panel-results">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluation Audit</p>
+                    <h2 class="text-3xl font-black mt-1">Global Quiz Attempt Logs</h2>
+                </div>
                 <div class="table-wrap mt-4">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Quiz</th><th>User</th><th>Score</th><th>Submitted</th></tr>
+                            <tr>
+                                <th>Attempt ID</th>
+                                <th>User Name</th>
+                                <th>Quiz Title</th>
+                                <th>Score Obtained</th>
+                                <th>Accuracy</th>
+                                <th>Submitted At</th>
+                            </tr>
                         </thead>
-                        <tbody>
-                            <tr><td>Spring Boot Basics</td><td>Asha</td><td>3/3</td><td>Today</td></tr>
-                            <tr><td>Java Core</td><td>Rahul</td><td>7/10</td><td>Yesterday</td></tr>
-                            <tr><td>REST APIs</td><td>Mira</td><td>9/10</td><td>This week</td></tr>
+                        <tbody id="admin-results-table">
+                            <tr>
+                                <td colspan="6" class="text-center text-slate-400 py-4">No quiz attempts recorded.</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
         </section>
     </main>
+
     <script src="app.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: quiz_system
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: 
     ports:
       - "3306:3306"
     volumes:
@@ -30,7 +30,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - quiz-network
 

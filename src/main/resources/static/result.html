@@ -3,74 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizBot Result</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QuizBot - Performance Card</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="app-shell topbar">
         <a class="brand" href="dashboard.html">
             <span class="brand-mark"><i data-lucide="sparkles"></i></span>
-            <span class="text-2xl">QuizBot</span>
+            <span class="text-2xl font-black">QuizBot</span>
         </a>
         <nav class="nav-links">
             <a class="nav-link" href="dashboard.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-            <a class="nav-link" href="quiz.html"><i data-lucide="list-checks"></i><span>Quiz</span></a>
-            <a class="nav-link active" href="result.html"><i data-lucide="trophy"></i><span>Result</span></a>
-            <a class="nav-link" href="admin-login.html"><i data-lucide="shield-check"></i><span>Admin Login</span></a>
+            <a class="nav-link" href="quiz.html" id="nav-quiz-link"><i data-lucide="list-checks"></i><span>Quiz</span></a>
+            <a class="nav-link active" href="result.html"><i data-lucide="trophy"></i><span>Results</span></a>
+            <a class="nav-link" href="admin.html" id="nav-admin-link" style="display: none;"><i data-lucide="shield-check"></i><span>Admin Control</span></a>
             <button class="nav-link" type="button" onclick="logout(event)"><i data-lucide="log-out"></i><span>Logout</span></button>
         </nav>
     </header>
 
-    <main class="app-shell page-grid">
-        <aside class="panel p-5 text-center">
-            <img class="mascot" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
-            <h1 class="mt-4 text-4xl font-black" data-percent>67%</h1>
-            <p class="font-bold text-slate-500">Final score</p>
-            <button class="btn btn-coral mt-6 w-full" type="button" onclick="logout(event)"><i data-lucide="log-out"></i>Logout</button>
+    <main class="app-shell page-grid animate-fade-in">
+        <!-- Results Gauge Sidebar -->
+        <aside class="panel text-center flex flex-col gap-5">
+            <div class="relative py-4">
+                <i data-lucide="trophy" class="mx-auto" style="width: 64px; height: 64px; color: var(--warning); filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.4));"></i>
+            </div>
+            <div>
+                <h1 class="text-5xl font-black text-white" id="result-percent">0%</h1>
+                <p class="font-bold text-slate-400 mt-1">Accuracy Achieved</p>
+            </div>
+            <div class="space-y-2 mt-4">
+                <button class="btn btn-primary w-full" onclick="retryLastQuiz()"><i data-lucide="rotate-ccw"></i> Restart Test</button>
+                <a class="btn w-full" href="dashboard.html"><i data-lucide="home"></i> Dashboard</a>
+            </div>
         </aside>
 
+        <!-- Detailed Breakdown -->
         <section class="space-y-6">
-            <section class="panel p-5 sm:p-7">
-                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <p class="text-sm font-black text-slate-500">Result summary</p>
-                        <h2 class="text-4xl font-black" data-result-title>Spring Boot Basics</h2>
-                    </div>
-                    <span class="pill">Submitted <span data-submitted-at>Demo result</span></span>
+            <!-- Score Overview Card -->
+            <section class="panel">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluation Sheet</p>
+                    <h2 class="text-3xl font-black mt-1" id="result-quiz-title">Quiz Title</h2>
                 </div>
-                <div class="mt-7 grid gap-4 sm:grid-cols-3">
+
+                <div class="mt-6 grid gap-4 sm:grid-cols-3">
                     <div class="stat card">
-                        <i data-lucide="badge-check"></i>
-                        <strong class="text-3xl" data-score>2/3</strong>
-                        <span class="font-bold text-slate-500">Correct</span>
+                        <i data-lucide="check-circle" style="color: var(--success);"></i>
+                        <strong class="text-3xl" id="result-score">0 / 0</strong>
+                        <span class="font-bold text-slate-400">Correct Answers</span>
                     </div>
                     <div class="stat card">
-                        <i data-lucide="percent"></i>
-                        <strong class="text-3xl" data-percent>67%</strong>
-                        <span class="font-bold text-slate-500">Accuracy</span>
+                        <i data-lucide="calendar"></i>
+                        <strong class="text-xl" id="result-date" style="padding-top: 6px; padding-bottom: 6px;">Today</strong>
+                        <span class="font-bold text-slate-400">Submission Date</span>
                     </div>
                     <div class="stat card">
-                        <i data-lucide="timer-reset"></i>
-                        <strong class="text-3xl">08m</strong>
-                        <span class="font-bold text-slate-500">Time</span>
+                        <i data-lucide="clock" style="color: var(--accent);"></i>
+                        <strong class="text-3xl" id="result-time">N/A</strong>
+                        <span class="font-bold text-slate-400">Time Taken</span>
                     </div>
                 </div>
+
                 <div class="mt-6 progress-track">
-                    <div class="progress-fill" data-result-progress style="width: 67%"></div>
+                    <div class="progress-fill" id="result-progress-fill" style="width: 0%"></div>
                 </div>
             </section>
 
-            <div class="flex flex-wrap gap-3">
-                <a class="btn btn-primary" href="quiz.html"><i data-lucide="rotate-ccw"></i>Try again</a>
-                <a class="btn btn-yellow" href="dashboard.html"><i data-lucide="home"></i>Dashboard</a>
-            </div>
+            <!-- Diagnostic Review (Breakdown of right/wrong answers) -->
+            <section class="panel">
+                <h3 class="text-2xl font-black mb-4">Question Breakdown</h3>
+                <div class="space-y-4" id="result-breakdown-list">
+                    <div class="text-slate-400 text-center py-4">No breakdown available for this attempt.</div>
+                </div>
+            </section>
         </section>
     </main>
+
     <script src="app.js"></script>
 </body>
 </html>

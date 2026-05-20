@@ -3,70 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizBot Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QuizBot - Enter the Arena</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main class="app-shell hero-grid">
-        <section class="space-y-7">
+    <main class="app-shell hero-grid animate-fade-in">
+        <section class="space-y-6">
             <div class="brand">
                 <span class="brand-mark"><i data-lucide="sparkles"></i></span>
-                <span class="text-2xl">QuizBot</span>
+                <span class="text-3xl font-black">QuizBot</span>
             </div>
 
-            <div class="space-y-5">
-                <span class="pill bg-white">AI powered quiz desk</span>
-                <h1 class="max-w-3xl text-5xl font-black leading-tight sm:text-6xl">Practice, answer, and level up with a playful quiz buddy.</h1>
-                <p class="max-w-2xl text-lg font-bold text-slate-600">A bright responsive interface for students, quiz takers, and admins.</p>
+            <div class="space-y-4">
+                <span class="pill pill-info"><i data-lucide="cpu" style="width: 14px; height: 14px;"></i> AI-Powered Quiz Platform</span>
+                <h1 class="max-w-3xl text-5xl font-black leading-tight sm:text-6xl">Sharpen your mind. Test your skills.</h1>
+                <p class="max-w-2xl text-lg font-medium text-slate-400">An interactive playground for students and developers. Answer questions on Java, Spring Boot, Git, and Frontend engineering to level up your knowledge.</p>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-3">
                 <div class="stat card">
                     <i data-lucide="brain-circuit"></i>
-                    <strong class="text-2xl">12</strong>
-                    <span class="font-bold text-slate-500">Active quizzes</span>
+                    <strong class="text-3xl" id="stat-quizzes-count">4</strong>
+                    <span class="font-bold text-slate-400">Dynamic Topics</span>
                 </div>
                 <div class="stat card">
-                    <i data-lucide="target"></i>
-                    <strong class="text-2xl">86%</strong>
-                    <span class="font-bold text-slate-500">Avg score</span>
+                    <i data-lucide="award"></i>
+                    <strong class="text-3xl">Instant</strong>
+                    <span class="font-bold text-slate-400">Result Grading</span>
                 </div>
                 <div class="stat card">
-                    <i data-lucide="users"></i>
-                    <strong class="text-2xl">240</strong>
-                    <span class="font-bold text-slate-500">Learners</span>
+                    <i data-lucide="shield-check"></i>
+                    <strong class="text-3xl">Secure</strong>
+                    <span class="font-bold text-slate-400">Admin Control</span>
                 </div>
             </div>
         </section>
 
-        <section class="panel p-5 sm:p-7">
-            <img class="mascot" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
-            <form class="mt-5 grid gap-4" onsubmit="saveDemoUser(event)">
-                <label class="grid gap-2">
-                    <span class="font-black">Name</span>
-                    <input class="field" data-name type="text" value="Asha" autocomplete="name">
+        <section class="panel">
+            <div class="text-center mb-4">
+                <img class="mascot" src="assets/quiz-ai-mascot.png" alt="QuizBot Mascot">
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" id="tab-login" onclick="switchLoginTab('login')">Login</button>
+                <button class="tab" id="tab-register" onclick="switchLoginTab('register')">Register</button>
+                <button class="tab" id="tab-admin" onclick="switchLoginTab('admin')">Admin</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="form-login" class="grid gap-4" onsubmit="handleUserLogin(event)">
+                <label class="grid">
+                    <span>Email Address</span>
+                    <input class="field" type="email" id="login-email" required placeholder="asha@example.com" autocomplete="email">
                 </label>
-                <label class="grid gap-2">
-                    <span class="font-black">Email</span>
-                    <input class="field" type="email" value="asha@example.com" autocomplete="email">
+                <label class="grid">
+                    <span>Password</span>
+                    <input class="field" type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
                 </label>
-                <label class="grid gap-2">
-                    <span class="font-black">Password</span>
-                    <input class="field" type="password" value="secret123" autocomplete="current-password">
-                </label>
-                <button class="btn btn-primary w-full" type="submit">
+                <div id="login-error" class="text-sm font-semibold text-danger" style="display: none;"></div>
+                <button class="btn btn-primary w-full mt-2" type="submit">
                     <i data-lucide="log-in"></i>
-                    Enter dashboard
+                    Sign In
                 </button>
-                <a class="btn w-full" href="admin-login.html">
+            </form>
+
+            <!-- Register Form -->
+            <form id="form-register" class="grid gap-4 hidden" onsubmit="handleUserRegister(event)">
+                <label class="grid">
+                    <span>Full Name</span>
+                    <input class="field" type="text" id="register-name" required placeholder="Asha Dev" autocomplete="name">
+                </label>
+                <label class="grid">
+                    <span>Email Address</span>
+                    <input class="field" type="email" id="register-email" required placeholder="asha@example.com" autocomplete="email">
+                </label>
+                <label class="grid">
+                    <span>Password</span>
+                    <input class="field" type="password" id="register-password" required placeholder="At least 6 characters" minlength="6" autocomplete="new-password">
+                </label>
+                <div id="register-error" class="text-sm font-semibold text-danger" style="display: none;"></div>
+                <div id="register-success" class="text-sm font-semibold text-accent" style="display: none;">Account created! Switching to Login...</div>
+                <button class="btn btn-accent w-full mt-2" type="submit">
+                    <i data-lucide="user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <!-- Admin Form -->
+            <form id="form-admin" class="grid gap-4 hidden" onsubmit="handleAdminLogin(event)">
+                <label class="grid">
+                    <span>Admin Email</span>
+                    <input class="field" type="email" id="admin-email" required value="admin@quizbot.com" placeholder="admin@quizbot.com">
+                </label>
+                <label class="grid">
+                    <span>Password</span>
+                    <input class="field" type="password" id="admin-password" required placeholder="admin123">
+                </label>
+                <div id="admin-error" class="text-sm font-semibold text-danger" style="display: none;">Invalid admin credentials</div>
+                <button class="btn btn-coral w-full mt-2" type="submit">
                     <i data-lucide="shield-check"></i>
-                    Admin login
-                </a>
+                    Admin Access
+                </button>
             </form>
         </section>
     </main>

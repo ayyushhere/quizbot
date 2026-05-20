@@ -3,63 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizBot Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QuizBot - Solve Challenge</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="app-shell topbar">
         <a class="brand" href="dashboard.html">
             <span class="brand-mark"><i data-lucide="sparkles"></i></span>
-            <span class="text-2xl">QuizBot</span>
+            <span class="text-2xl font-black">QuizBot</span>
         </a>
         <nav class="nav-links">
             <a class="nav-link" href="dashboard.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
             <a class="nav-link active" href="quiz.html"><i data-lucide="list-checks"></i><span>Quiz</span></a>
-            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Result</span></a>
-            <a class="nav-link" href="admin-login.html"><i data-lucide="shield-check"></i><span>Admin Login</span></a>
+            <a class="nav-link" href="result.html"><i data-lucide="trophy"></i><span>Results</span></a>
+            <a class="nav-link" href="admin.html" id="nav-admin-link" style="display: none;"><i data-lucide="shield-check"></i><span>Admin Control</span></a>
             <button class="nav-link" type="button" onclick="logout(event)"><i data-lucide="log-out"></i><span>Logout</span></button>
         </nav>
     </header>
 
-    <main class="app-shell page-grid">
-        <aside class="panel p-5">
+    <main class="app-shell page-grid animate-fade-in">
+        <!-- Quiz Sidebar Control -->
+        <aside class="panel flex flex-col gap-5">
             <div class="flex items-center gap-4">
-                <img class="w-24" src="assets/quiz-ai-mascot.png" alt="Cartoon AI quiz tutor mascot">
+                <span class="grid h-12 w-12 place-items-center rounded-xl bg-[#eaf0ff] border-2 border-slate-700" style="color: var(--primary);">
+                    <i data-lucide="help-circle"></i>
+                </span>
                 <div>
-                    <p class="text-sm font-black text-slate-500" data-quiz-category>Spring Boot</p>
-                    <h1 class="text-2xl font-black" data-quiz-title>Basics Quiz</h1>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider" id="quiz-badge-category">Topic</p>
+                    <h2 class="text-xl font-black" id="quiz-sidebar-title">Solve Quiz</h2>
                 </div>
             </div>
-            <div class="mt-6">
-                <div class="mb-2 flex items-center justify-between font-black">
-                    <span>Answered</span>
-                    <span data-progress-label>0/3</span>
+
+            <!-- Quiz Timer Widget -->
+            <div class="card text-center bg-slate-900 border-indigo-950 p-4">
+                <i data-lucide="hourglass" class="mx-auto" style="color: var(--secondary); width: 24px; height: 24px; margin-bottom: 6px;"></i>
+                <p class="text-xs font-bold text-slate-400 uppercase">Time Remaining</p>
+                <div class="text-3xl font-black mt-1 text-white" id="quiz-timer">10:00</div>
+            </div>
+
+            <!-- Progress widget -->
+            <div>
+                <div class="mb-2 flex items-center justify-between font-black text-sm">
+                    <span class="text-slate-400">Questions Answered</span>
+                    <span id="quiz-progress-label">0/0</span>
                 </div>
                 <div class="progress-track">
-                    <div class="progress-fill" data-progress style="width: 0%"></div>
+                    <div class="progress-fill" id="quiz-progress-fill" style="width: 0%"></div>
                 </div>
             </div>
-            <a class="btn btn-yellow mt-4 w-full" href="dashboard.html">
-                <i data-lucide="layout-dashboard"></i>
-                Change quiz
-            </a>
-            <button class="btn btn-coral mt-6 w-full" type="button" onclick="submitDemoQuiz()">
-                <i data-lucide="send"></i>
-                Submit answers
-            </button>
-            <button class="btn mt-4 w-full" type="button" onclick="logout(event)">
-                <i data-lucide="log-out"></i>
-                Logout
-            </button>
+
+            <div class="space-y-2 mt-2">
+                <button class="btn btn-primary w-full" type="button" id="btn-submit-quiz" onclick="submitActiveQuiz()">
+                    <i data-lucide="send"></i> Submit Answers
+                </button>
+                <a class="btn w-full" href="dashboard.html">
+                    <i data-lucide="arrow-left"></i> Leave Arena
+                </a>
+            </div>
         </aside>
 
-        <section class="grid gap-5" data-quiz></section>
+        <!-- Main Question Desk -->
+        <section class="space-y-6">
+            <!-- Question Box -->
+            <div class="panel p-6 min-h-24 flex flex-col justify-between" id="question-container">
+                <!-- Loaded dynamically by app.js -->
+                <div class="text-center text-slate-400 py-6">
+                    <i data-lucide="loader" class="animate-spin mx-auto mb-2"></i> Loading quiz questions...
+                </div>
+            </div>
+
+            <!-- Bottom Pagination Navigation -->
+            <div class="flex items-center justify-between gap-4">
+                <button class="btn" type="button" id="btn-prev-question" onclick="navigateQuestion(-1)">
+                    <i data-lucide="chevron-left"></i> Previous
+                </button>
+                <div class="flex items-center gap-2" id="question-dots">
+                    <!-- Dots loaded dynamically -->
+                </div>
+                <button class="btn btn-accent" type="button" id="btn-next-question" onclick="navigateQuestion(1)">
+                    Next <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+        </section>
     </main>
+
     <script src="app.js"></script>
 </body>
 </html>
