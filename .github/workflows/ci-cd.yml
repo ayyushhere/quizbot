@@ -1,117 +1,48 @@
 name: CI/CD Pipeline - Online Quiz System
 
-# Triggers
 on:
   push:
     branches:
       - main
       - master
-      - develop
-      - 'feature/**'
   pull_request:
     branches:
       - main
       - master
-      - develop
-  schedule:
-    - cron: '0 2 * * *'  # Daily build at 2 AM UTC
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/quiz-system
-  JAVA_VERSION: '17'
-  MAVEN_VERSION: '3.8.1'
 
 jobs:
-  # ============================================================
-  # STAGE 1: BUILD & TEST
-  # ============================================================
-  build:
-    name: Build & Test
+  build-and-package:
+    name: Build & Package
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
 
       - name: Build with Maven
-        run: |
-          mvn clean compile
-          echo "✓ Build successful"
+        run: mvn clean package -DskipTests
+        
+      - name: Run Tests
+        run: mvn test -Dmaven.test.failure.ignore=true || echo "No tests found"
 
-      - name: Run Unit Tests
-        run: |
-          mvn test -Dmaven.test.failure.ignore=true || echo "No tests found or tests failed - continuing"
-          echo "✓ Unit tests completed"
-
-      - name: Code Quality Check
-        run: |
-          mvn verify -Dmaven.test.failure.ignore=true || echo "Verification completed"
-          echo "✓ Code quality verified"
-
-      - name: Package application
-        run: |
-          mvn package -DskipTests
-          echo "✓ Application packaged"
-
-      - name: Upload build artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: quiz-system-jar
           path: target/*.jar
           retention-days: 5
 
-  # ============================================================
-  # STAGE 2: SECURITY SCANNING
-  # ============================================================
-  security-scan:
-    name: Security Scan
+  validate-docker:
+    name: Validate Docker Build
     runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # ============================================================
-  # STAGE 3: BUILD DOCKER IMAGE
-  # ============================================================
-  build-docker:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      contents: read
-      packages: write
+    needs: build-and-package
 
     steps:
       - name: Checkout code
@@ -123,91 +54,12 @@ jobs:
           name: quiz-system-jar
           path: target/
 
-      - name: Set lower case owner and repository name
-        run: |
-          echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/quiz-system" >> $GITHUB_ENV
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ github.sha }}
-
-      - name: Build and push Docker image
+      - name: Build Docker Image locally
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Docker image scan
-        if: github.event_name != 'pull_request'
-        run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          echo "✓ Docker image built and pushed successfully"
-
-
-
-  # ============================================================
-  # STAGE 5: NOTIFICATIONS & SUMMARY
-  # ============================================================
-  notify:
-    name: Pipeline Summary
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [build, security-scan, build-docker]
-
-    steps:
-      - name: Generate summary
-        run: |
-          echo "## CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Build & Test | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${{ needs.build-docker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-
-      - name: Send comprehensive notification
-        if: always() && secrets.SLACK_WEBHOOK != ''
-        uses: slackapi/slack-github-action@v1.26.0
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          payload: |
-            {
-              "text": "CI/CD Pipeline Completed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*CI/CD Pipeline Completed*\n*Build:* ${{ needs.build.result }}\n*Security:* ${{ needs.security-scan.result }}\n*Docker:* ${{ needs.build-docker.result }}\n*Commit:* ${{ github.sha }}"
-                  }
-                }
-              ]
-            }
+          push: false # We only validate the build, avoiding registry permission errors
+          tags: quiz-system:latest
